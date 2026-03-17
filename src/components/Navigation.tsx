@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "@/lib/language";
 
 const links = [
@@ -34,13 +35,31 @@ export default function Navigation() {
         }`}
       >
         <nav className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-16 sm:h-20">
-          {/* Logo — text only, elegant */}
-          <Link href="/" className="group flex items-baseline gap-2">
-            <span className={`font-display text-xl sm:text-2xl font-semibold tracking-tight transition-colors duration-500 ${
-              scrolled ? "text-ink-900" : "text-white"
-            }`}>
-              {lang === "en" ? "Niranjana Swami" : "Ниранджана Свами"}
-            </span>
+          {/* Logo with ISKCON emblem */}
+          <Link href="/" className="group flex items-center gap-3">
+            <Image
+              src="/images/iskcon-logo.svg"
+              alt="ISKCON"
+              width={36}
+              height={36}
+              className={`transition-all duration-500 ${
+                scrolled ? "opacity-90" : "opacity-80 brightness-0 invert"
+              }`}
+            />
+            <div className="flex flex-col">
+              <span className={`font-display text-lg sm:text-xl font-semibold tracking-tight leading-tight transition-colors duration-500 ${
+                scrolled ? "text-ink-900" : "text-white"
+              }`}>
+                {lang === "en" ? "Niranjana Swami" : "Ниранджана Свами"}
+              </span>
+              <span className={`hidden sm:block text-[9px] uppercase tracking-[0.15em] leading-tight transition-colors duration-500 ${
+                scrolled ? "text-ink-400" : "text-white/40"
+              }`}>
+                {lang === "en"
+                  ? "ISKCON Founder–Acharya: HDG A.C. Bhaktivedanta Swami Prabhupada"
+                  : "Основатель–Ачарья ИСККОН: А.Ч. Бхактиведанта Свами Прабхупада"}
+              </span>
+            </div>
           </Link>
 
           {/* Desktop links */}

@@ -147,7 +147,7 @@ export default function Home() {
           text="Hare Krishna Hare Krishna · Krishna Krishna Hare Hare · Hare Rama Hare Rama · Rama Rama Hare Hare"
           separator="       ◆       "
           speed={50}
-          className="text-ink-400/50 font-display text-sm italic tracking-wider"
+          className="text-gold-500 font-display text-sm italic tracking-wider"
         />
       </div>
 
