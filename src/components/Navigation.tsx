@@ -30,14 +30,12 @@ export default function Navigation() {
       <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-ink-900 h-8"
-            : "bg-black/30 backdrop-blur-sm h-9"
+            ? "bg-ink-950 h-9"
+            : "bg-ink-950/80 backdrop-blur-md h-10"
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 h-full flex items-center justify-center">
-          <p className={`text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium transition-colors duration-500 ${
-            scrolled ? "text-white/60" : "text-white/50"
-          }`}>
+          <p className="text-[11px] sm:text-[13px] tracking-[0.2em] uppercase font-medium text-gold-400/80">
             {lang === "en"
               ? "ISKCON Founder–Acharya: His Divine Grace A.C. Bhaktivedanta Swami Prabhupada"
               : "Основатель–Ачарья ИСККОН: Его Божественная Милость А.Ч. Бхактиведанта Свами Прабхупада"}
@@ -49,8 +47,8 @@ export default function Navigation() {
       <header
         className={`fixed left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "top-8 bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.06)]"
-            : "top-9 bg-transparent"
+            ? "top-9 bg-white/95 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.06)]"
+            : "top-10 bg-ink-950/50 backdrop-blur-md border-b border-white/10"
         }`}
       >
         <nav className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-16 sm:h-20">

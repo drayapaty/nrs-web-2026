@@ -23,7 +23,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-temple-50">
+      <body className="min-h-screen bg-cream-50">
         <Providers>{children}</Providers>
       </body>
     </html>
