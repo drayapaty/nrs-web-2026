@@ -1,5 +1,17 @@
 const API_BASE = "https://backend.niranjanaswami.net/api";
 
+/* ── Raw API response shape from backend ── */
+interface ApiListResponse<T> {
+  data: T[];
+  meta: {
+    page: number;
+    totalPages: number;
+    total: number;
+    itemsCount: number;
+    itemsPerPage: number;
+  };
+}
+
 /* ── Generic fetch with 8s timeout ── */
 async function apiFetch<T>(url: string): Promise<T> {
   const controller = new AbortController();
@@ -9,13 +21,27 @@ async function apiFetch<T>(url: string): Promise<T> {
     const res = await fetch(url, {
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
-      next: { revalidate: 300 },
     });
     if (!res.ok) throw new Error(`API ${res.status}`);
     return res.json();
   } finally {
     clearTimeout(timeout);
   }
+}
+
+/* ── Helper: transform raw API list response to our normalized shape ── */
+function normalizeList<T>(raw: ApiListResponse<T>): {
+  results: T[];
+  total: number;
+  page: number;
+  pages: number;
+} {
+  return {
+    results: raw.data || [],
+    total: raw.meta?.total || 0,
+    page: raw.meta?.page || 1,
+    pages: raw.meta?.totalPages || 1,
+  };
 }
 
 /* ══════════════════════════════════════
@@ -44,16 +70,18 @@ export interface LectureListResponse {
   pages: number;
 }
 
-const LECTURE_ATTRS = "uuid,publishedDate,en.title,cyr.title,createdDateTime,tags,audioLink,audioLinkPresigned,duration";
+const LECTURE_ATTRS = "uuid,publishedDate,en.title,cyr.title,createdDateTime,tags,audioLink,audioLinkPresigned,duration,lectureDate,place";
 
 export async function getLectures(page = 1): Promise<LectureListResponse> {
-  return apiFetch<LectureListResponse>(
+  const raw = await apiFetch<ApiListResponse<Lecture>>(
     `${API_BASE}/lecture/list?attributes=${encodeURIComponent(LECTURE_ATTRS)}&page=${page}`
   );
+  return normalizeList(raw);
 }
 
 export async function getLecture(id: string): Promise<Lecture> {
-  return apiFetch<Lecture>(`${API_BASE}/Lecture/${id}?author=ns`);
+  const raw = await apiFetch<{ data: Lecture }>(`${API_BASE}/lecture/${id}?author=ns`);
+  return raw.data || (raw as unknown as Lecture);
 }
 
 /* ══════════════════════════════════════
@@ -79,13 +107,15 @@ export interface BlogListResponse {
 }
 
 export async function getBlogs(page = 1): Promise<BlogListResponse> {
-  return apiFetch<BlogListResponse>(
+  const raw = await apiFetch<ApiListResponse<BlogPost>>(
     `${API_BASE}/blog/list?author=Niranjana%20Swami&page=${page}&status=published&trim=true`
   );
+  return normalizeList(raw);
 }
 
 export async function getBlog(id: string): Promise<BlogPost> {
-  return apiFetch<BlogPost>(`${API_BASE}/blog/${id}`);
+  const raw = await apiFetch<{ data: BlogPost }>(`${API_BASE}/blog/${id}`);
+  return raw.data || (raw as unknown as BlogPost);
 }
 
 /* ══════════════════════════════════════
@@ -109,21 +139,24 @@ export interface Quote {
 export interface QuoteListResponse {
   results: Quote[];
   total: number;
+  page: number;
+  pages: number;
 }
 
 export async function getQuotes(page = 1): Promise<QuoteListResponse> {
-  const today = new Date().toISOString().split("T")[0];
-  return apiFetch<QuoteListResponse>(
-    `${API_BASE}/quote/list?author=Niranjana%20Swami&page=${page}&quoteDateRange=${today}`
+  const raw = await apiFetch<ApiListResponse<Quote>>(
+    `${API_BASE}/quote/list?author=Niranjana%20Swami&page=${page}`
   );
+  return normalizeList(raw);
 }
 
 export async function getQuoteOfTheDay(): Promise<Quote> {
   const today = new Date().toISOString().split("T")[0];
-  const data = await apiFetch<QuoteListResponse>(
+  const raw = await apiFetch<ApiListResponse<Quote>>(
     `${API_BASE}/quote/list?author=Niranjana%20Swami&page=1&quoteDateRange=${today}`
   );
-  if (data.results && data.results.length > 0) return data.results[0];
+  const items = raw.data || [];
+  if (items.length > 0) return items[0];
   throw new Error("No quote found");
 }
 
@@ -149,7 +182,8 @@ export interface KirtanListResponse {
 }
 
 export async function getKirtans(page = 1): Promise<KirtanListResponse> {
-  return apiFetch<KirtanListResponse>(`${API_BASE}/kirtan/list?page=${page}`);
+  const raw = await apiFetch<ApiListResponse<Kirtan>>(`${API_BASE}/kirtan/list?page=${page}`);
+  return normalizeList(raw);
 }
 
 /* ══════════════════════════════════════
@@ -167,10 +201,13 @@ export interface GalleryAlbum {
 export interface GalleryListResponse {
   results: GalleryAlbum[];
   total: number;
+  page: number;
+  pages: number;
 }
 
 export async function getGalleries(page = 1): Promise<GalleryListResponse> {
-  return apiFetch<GalleryListResponse>(`${API_BASE}/gallery/list?page=${page}`);
+  const raw = await apiFetch<ApiListResponse<GalleryAlbum>>(`${API_BASE}/gallery/list?page=${page}`);
+  return normalizeList(raw);
 }
 
 /* ══════════════════════════════════════
@@ -188,20 +225,24 @@ export interface Video {
 export interface VideoListResponse {
   results: Video[];
   total: number;
+  page: number;
+  pages: number;
 }
 
 export async function getVideos(type?: string): Promise<VideoListResponse> {
   const url = type
     ? `${API_BASE}/video?type=${type}`
     : `${API_BASE}/video?missing=type`;
-  return apiFetch<VideoListResponse>(url);
+  const raw = await apiFetch<ApiListResponse<Video>>(url);
+  return normalizeList(raw);
 }
 
 /* ══════════════════════════════════════
    Recently Added
    ══════════════════════════════════════ */
 export async function getRecent(): Promise<unknown[]> {
-  return apiFetch<unknown[]>(`${API_BASE}/recent`);
+  const raw = await apiFetch<{ data: unknown[] }>(`${API_BASE}/recent`);
+  return raw.data || [];
 }
 
 /* ══════════════════════════════════════
@@ -219,17 +260,21 @@ export interface SankirtanaStory {
 export interface SankirtanaListResponse {
   results: SankirtanaStory[];
   total: number;
+  page: number;
+  pages: number;
 }
 
 export async function getSankirtana(page = 1): Promise<SankirtanaListResponse> {
-  return apiFetch<SankirtanaListResponse>(`${API_BASE}/social/list?approved=1&page=${page}`);
+  const raw = await apiFetch<ApiListResponse<SankirtanaStory>>(`${API_BASE}/social/list?approved=1&page=${page}`);
+  return normalizeList(raw);
 }
 
 /* ══════════════════════════════════════
    Search
    ══════════════════════════════════════ */
 export async function search(query: string, index = "lectures_prod"): Promise<{ results: unknown[]; total: number }> {
-  return apiFetch(
+  const raw = await apiFetch<{ data: unknown[]; meta?: { total?: number } }>(
     `${API_BASE}/search?page=1&pageSize=8&q=${encodeURIComponent(query)}&indexes=${index}`
   );
+  return { results: raw.data || [], total: raw.meta?.total || 0 };
 }

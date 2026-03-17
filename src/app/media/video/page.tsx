@@ -13,7 +13,7 @@ export default function VideoPage() {
 
   const { data, loading } = useApi<VideoListResponse>(
     () => getVideos(),
-    { results: [], total: 0 }
+    { results: [], total: 0, page: 1, pages: 1 }
   );
 
   const videos = data.results || [];

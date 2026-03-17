@@ -21,7 +21,7 @@ export default function SankirtanaPage() {
 
   const { data, loading } = useApi<SankirtanaListResponse>(
     () => getSankirtana(page),
-    { results: [], total: 0 },
+    { results: [], total: 0, page: 1, pages: 1 },
     [page]
   );
 

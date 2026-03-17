@@ -15,7 +15,7 @@ export default function GalleryPage() {
 
   const { data, loading } = useApi<GalleryListResponse>(
     () => getGalleries(page),
-    { results: [], total: 0 },
+    { results: [], total: 0, page: 1, pages: 1 },
     [page]
   );
 

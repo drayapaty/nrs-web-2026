@@ -15,7 +15,7 @@ export default function QuotesPage() {
 
   const { data, loading } = useApi<QuoteListResponse>(
     () => getQuotes(page),
-    { results: [], total: 0 },
+    { results: [], total: 0, page: 1, pages: 1 },
     [page]
   );
 
