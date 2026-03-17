@@ -26,40 +26,50 @@ export default function Navigation() {
 
   return (
     <>
-      {/* ── Floating nav ── */}
-      <header
+      {/* ── Founder-Acharya top bar ── */}
+      <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.06)]"
-            : "bg-transparent"
+            ? "bg-ink-900 h-8"
+            : "bg-black/30 backdrop-blur-sm h-9"
+        }`}
+      >
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 h-full flex items-center justify-center">
+          <p className={`text-[11px] sm:text-xs tracking-[0.2em] uppercase font-medium transition-colors duration-500 ${
+            scrolled ? "text-white/60" : "text-white/50"
+          }`}>
+            {lang === "en"
+              ? "ISKCON Founder–Acharya: His Divine Grace A.C. Bhaktivedanta Swami Prabhupada"
+              : "Основатель–Ачарья ИСККОН: Его Божественная Милость А.Ч. Бхактиведанта Свами Прабхупада"}
+          </p>
+        </div>
+      </div>
+
+      {/* ── Main nav ── */}
+      <header
+        className={`fixed left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "top-8 bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.06)]"
+            : "top-9 bg-transparent"
         }`}
       >
         <nav className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-16 sm:h-20">
-          {/* Logo with ISKCON emblem */}
+          {/* Logo + Name */}
           <Link href="/" className="group flex items-center gap-3">
             <Image
               src="/images/iskcon-logo.svg"
               alt="ISKCON"
-              width={36}
-              height={36}
+              width={42}
+              height={42}
               className={`transition-all duration-500 ${
                 scrolled ? "opacity-90" : "opacity-80 brightness-0 invert"
               }`}
             />
-            <div className="flex flex-col">
-              <span className={`font-display text-lg sm:text-xl font-semibold tracking-tight leading-tight transition-colors duration-500 ${
-                scrolled ? "text-ink-900" : "text-white"
-              }`}>
-                {lang === "en" ? "Niranjana Swami" : "Ниранджана Свами"}
-              </span>
-              <span className={`hidden sm:block text-[9px] uppercase tracking-[0.15em] leading-tight transition-colors duration-500 ${
-                scrolled ? "text-ink-400" : "text-white/40"
-              }`}>
-                {lang === "en"
-                  ? "ISKCON Founder–Acharya: HDG A.C. Bhaktivedanta Swami Prabhupada"
-                  : "Основатель–Ачарья ИСККОН: А.Ч. Бхактиведанта Свами Прабхупада"}
-              </span>
-            </div>
+            <span className={`font-display text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-500 ${
+              scrolled ? "text-ink-900" : "text-white"
+            }`}>
+              {lang === "en" ? "Niranjana Swami" : "Ниранджана Свами"}
+            </span>
           </Link>
 
           {/* Desktop links */}
