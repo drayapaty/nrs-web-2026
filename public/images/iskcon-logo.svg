@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- ISKCON Logo - Stylized conch/tilak inspired mark -->
+  <circle cx="100" cy="100" r="95" stroke="#b4540c" stroke-width="3" fill="none"/>
+  <circle cx="100" cy="100" r="85" stroke="#d9700c" stroke-width="1.5" fill="none"/>
+  <!-- Inner lotus/tilak design -->
+  <path d="M100 30 C100 30 130 60 130 90 C130 120 115 140 100 160 C85 140 70 120 70 90 C70 60 100 30 100 30Z" fill="#d9700c" opacity="0.15"/>
+  <path d="M100 40 C100 40 125 65 125 90 C125 115 112 132 100 148 C88 132 75 115 75 90 C75 65 100 40 100 40Z" stroke="#b4540c" stroke-width="2" fill="none"/>
+  <!-- Center dot -->
+  <circle cx="100" cy="90" r="8" fill="#d9700c"/>
+  <!-- ISKCON text -->
+  <text x="100" y="185" text-anchor="middle" font-family="Georgia, serif" font-size="18" font-weight="bold" fill="#78381a" letter-spacing="4">ISKCON</text>
+</svg>

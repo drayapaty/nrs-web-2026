@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+@theme {
+  /* Spiritual & Serene Color Palette */
+  --color-saffron-50: #fef9ee;
+  --color-saffron-100: #fdf0d3;
+  --color-saffron-200: #fadda5;
+  --color-saffron-300: #f6c46d;
+  --color-saffron-400: #f2a633;
+  --color-saffron-500: #ee8c14;
+  --color-saffron-600: #d9700c;
+  --color-saffron-700: #b4540c;
+  --color-saffron-800: #924211;
+  --color-saffron-900: #783811;
+
+  --color-temple-50: #f8f6f3;
+  --color-temple-100: #eee9e1;
+  --color-temple-200: #ddd2c3;
+  --color-temple-300: #c8b49e;
+  --color-temple-400: #b6977e;
+  --color-temple-500: #a98167;
+  --color-temple-600: #9c6f5b;
+  --color-temple-700: #825a4d;
+  --color-temple-800: #6a4b43;
+  --color-temple-900: #573f38;
+
+  --color-sacred-50: #f4f7f4;
+  --color-sacred-100: #e3eae2;
+  --color-sacred-200: #c7d5c6;
+  --color-sacred-300: #9fb89d;
+  --color-sacred-400: #719571;
+  --color-sacred-500: #517851;
+  --color-sacred-600: #3d5f3d;
+  --color-sacred-700: #324d33;
+  --color-sacred-800: #2a3e2b;
+  --color-sacred-900: #233424;
+
+  --color-devotion-50: #fdf4f6;
+  --color-devotion-100: #fce8ef;
+  --color-devotion-200: #fad5e1;
+  --color-devotion-300: #f5b2c7;
+  --color-devotion-400: #ed84a4;
+  --color-devotion-500: #e15c83;
+  --color-devotion-600: #cc3a61;
+  --color-devotion-700: #b02a4d;
+  --color-devotion-800: #932641;
+  --color-devotion-900: #7d243c;
+
+  /* Typography — referenced by Tailwind's font-display and font-body utilities */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Spacing & layout */
+  --container-max: 1280px;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: #2d2420;
+    background: var(--color-temple-50);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 600;
+    color: #1a1210;
+    line-height: 1.2;
+  }
+}
+
+/* Custom audio player styling */
+.audio-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-saffron-500);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.audio-progress::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-saffron-500);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Decorative lotus divider */
+.lotus-divider::after {
+  content: "✿";
+  display: block;
+  text-align: center;
+  color: var(--color-saffron-400);
+  font-size: 1.5rem;
+  letter-spacing: 1.5rem;
+  opacity: 0.6;
+}
+
+/* ── Hero Ken Burns slow zoom ── */
+@keyframes kenburns {
+  0% {
+    transform: scale(1.0);
+  }
+  100% {
+    transform: scale(1.12);
+  }
+}
+
+.hero-kenburns {
+  animation: kenburns 25s ease-out forwards;
+}
+
+/* ── Hero content fade-in stagger ── */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-fade-1 { animation: heroFadeUp 1s ease-out 0.3s both; }
+.hero-fade-2 { animation: heroFadeUp 1s ease-out 0.6s both; }
+.hero-fade-3 { animation: heroFadeUp 1s ease-out 0.9s both; }
+.hero-fade-4 { animation: heroFadeUp 1s ease-out 1.2s both; }
+
+/* ── Saffron shimmer line ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.hero-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-saffron-600) 0%,
+    var(--color-saffron-400) 25%,
+    var(--color-saffron-300) 50%,
+    var(--color-saffron-400) 75%,
+    var(--color-saffron-600) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+/* ── Floating glow pulse ── */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+
+.hero-glow {
+  animation: glowPulse 6s ease-in-out infinite;
+}
+
+/* ── Scroll indicator bounce ── */
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0) translateX(-50%); opacity: 0.7; }
+  50% { transform: translateY(10px) translateX(-50%); opacity: 1; }
+}
+
+.hero-scroll-hint {
+  animation: gentleBounce 2.5s ease-in-out infinite;
+}
+
+/* ── Subtle text glow for saffron heading ── */
+.text-glow-saffron {
+  text-shadow:
+    0 0 40px rgba(238, 140, 20, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Infinite marquee ── */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marqueeScroll var(--marquee-speed, 30s) linear infinite;
+}
+
+/* ── Horizontal rule with lotus ── */
+.divider-lotus {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.divider-lotus::before,
+.divider-lotus::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-temple-200), transparent);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
