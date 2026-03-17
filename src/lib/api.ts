@@ -1,265 +1,235 @@
-const API_BASE = "https://nrs-backend-prod.herokuapp.com/api";
+const API_BASE = "https://backend.niranjanaswami.net/api";
 
-interface FetchOptions {
-  method?: string;
-  body?: unknown;
-  params?: Record<string, string | number | undefined>;
-}
+/* ── Generic fetch with 8s timeout ── */
+async function apiFetch<T>(url: string): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
 
-async function apiFetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
-  const { method = "GET", body, params } = options;
-
-  let url = `${API_BASE}${path}`;
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, val]) => {
-      if (val !== undefined) searchParams.set(key, String(val));
+  try {
+    const res = await fetch(url, {
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      next: { revalidate: 300 },
     });
-    const qs = searchParams.toString();
-    if (qs) url += `?${qs}`;
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    return res.json();
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-    next: { revalidate: 300 }, // cache 5 min for ISR
-  });
-
-  if (!res.ok) {
-    throw new Error(`API error ${res.status}: ${res.statusText}`);
-  }
-
-  return res.json();
 }
 
-// ──────────────────────────────────────────────
-// Lectures
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Lectures
+   ══════════════════════════════════════ */
 export interface Lecture {
-  _id: string;
-  title_en: string;
-  title_cyr?: string;
-  date: string;
-  place_en?: string;
-  place_cyr?: string;
-  language_en?: string;
-  language_cyr?: string;
-  length?: string;
-  url?: string;
+  uuid: string;
+  publishedDate?: string;
+  createdDateTime?: string;
+  en?: { title?: string };
+  cyr?: { title?: string };
+  tags?: { en?: string[] };
+  audioLink?: string;
+  audioLinkPresigned?: string;
+  duration?: string;
+  lectureDate?: string;
+  place?: { en?: string; cyr?: string };
+  language?: { en?: string; cyr?: string };
   counters?: { listens?: number; downloads?: number };
-  tags?: string[];
-  category_en?: string;
-  category_cyr?: string;
-  transcription_en?: string;
-  transcription_cyr?: string;
-  summary_en?: string;
-  summary_cyr?: string;
-  dateFormatted?: string;
 }
 
-interface LectureListResponse {
-  lectures: Lecture[];
+export interface LectureListResponse {
+  results: Lecture[];
   total: number;
   page: number;
   pages: number;
 }
 
-export async function getLectures(page = 1, limit = 10): Promise<LectureListResponse> {
-  return apiFetch<LectureListResponse>("/lecture", { params: { page, limit } });
+const LECTURE_ATTRS = "uuid,publishedDate,en.title,cyr.title,createdDateTime,tags,audioLink,audioLinkPresigned,duration";
+
+export async function getLectures(page = 1): Promise<LectureListResponse> {
+  return apiFetch<LectureListResponse>(
+    `${API_BASE}/lecture/list?attributes=${encodeURIComponent(LECTURE_ATTRS)}&page=${page}`
+  );
 }
 
 export async function getLecture(id: string): Promise<Lecture> {
-  return apiFetch<Lecture>(`/lecture/${id}`);
+  return apiFetch<Lecture>(`${API_BASE}/Lecture/${id}?author=ns`);
 }
 
-// ──────────────────────────────────────────────
-// Blog
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Blog
+   ══════════════════════════════════════ */
 export interface BlogPost {
-  _id: string;
-  title_en: string;
-  title_cyr?: string;
-  body_en?: string;
-  body_cyr?: string;
-  excerpt_en?: string;
-  excerpt_cyr?: string;
-  date: string;
-  dateFormatted?: string;
+  uuid?: string;
+  en?: { title?: string; body?: string };
+  cyr?: { title?: string; body?: string };
+  publishDate?: string;
+  blogDate?: string;
+  author?: string;
   status?: string;
-  tags?: string[];
-  counters?: { views?: number };
+  tags?: { en?: string[] };
   image?: string;
 }
 
-interface BlogListResponse {
-  blogs: BlogPost[];
+export interface BlogListResponse {
+  results: BlogPost[];
   total: number;
   page: number;
   pages: number;
 }
 
-export async function getBlogs(page = 1, limit = 10): Promise<BlogListResponse> {
-  return apiFetch<BlogListResponse>("/blog", { params: { page, limit } });
+export async function getBlogs(page = 1): Promise<BlogListResponse> {
+  return apiFetch<BlogListResponse>(
+    `${API_BASE}/blog/list?author=Niranjana%20Swami&page=${page}&status=published&trim=true`
+  );
 }
 
 export async function getBlog(id: string): Promise<BlogPost> {
-  return apiFetch<BlogPost>(`/blog/${id}`);
+  return apiFetch<BlogPost>(`${API_BASE}/blog/${id}`);
 }
 
-// ──────────────────────────────────────────────
-// Quotes
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Quotes
+   ══════════════════════════════════════ */
 export interface Quote {
-  _id: string;
-  text_en: string;
+  uuid?: string;
+  _id?: string;
+  en?: { text?: string; source?: string };
+  cyr?: { text?: string; source?: string };
+  author?: string;
+  quoteDate?: string;
+  // Legacy flat fields for fallback
+  text_en?: string;
   text_cyr?: string;
   source_en?: string;
   source_cyr?: string;
   date?: string;
 }
 
-interface QuoteListResponse {
-  quotes: Quote[];
+export interface QuoteListResponse {
+  results: Quote[];
   total: number;
 }
 
-export async function getQuotes(page = 1, limit = 10): Promise<QuoteListResponse> {
-  return apiFetch<QuoteListResponse>("/quote", { params: { page, limit } });
+export async function getQuotes(page = 1): Promise<QuoteListResponse> {
+  const today = new Date().toISOString().split("T")[0];
+  return apiFetch<QuoteListResponse>(
+    `${API_BASE}/quote/list?author=Niranjana%20Swami&page=${page}&quoteDateRange=${today}`
+  );
 }
 
 export async function getQuoteOfTheDay(): Promise<Quote> {
-  return apiFetch<Quote>("/quote/today");
+  const today = new Date().toISOString().split("T")[0];
+  const data = await apiFetch<QuoteListResponse>(
+    `${API_BASE}/quote/list?author=Niranjana%20Swami&page=1&quoteDateRange=${today}`
+  );
+  if (data.results && data.results.length > 0) return data.results[0];
+  throw new Error("No quote found");
 }
 
-// ──────────────────────────────────────────────
-// Kirtans
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Kirtans
+   ══════════════════════════════════════ */
 export interface Kirtan {
-  _id: string;
-  title_en: string;
-  title_cyr?: string;
-  date: string;
-  place_en?: string;
-  place_cyr?: string;
-  length?: string;
-  url?: string;
-  counters?: { listens?: number; downloads?: number };
+  uuid: string;
+  en?: { title?: string; artist?: string; location?: string };
+  cyr?: { title?: string; artist?: string; location?: string };
+  kirtanDate?: string;
+  audioLink?: string;
+  audioLinkPresigned?: string;
+  duration?: string;
+  tags?: { en?: string[] };
 }
 
-interface KirtanListResponse {
-  kirtans: Kirtan[];
+export interface KirtanListResponse {
+  results: Kirtan[];
   total: number;
   page: number;
   pages: number;
 }
 
-export async function getKirtans(page = 1, limit = 10): Promise<KirtanListResponse> {
-  return apiFetch<KirtanListResponse>("/kirtan", { params: { page, limit } });
+export async function getKirtans(page = 1): Promise<KirtanListResponse> {
+  return apiFetch<KirtanListResponse>(`${API_BASE}/kirtan/list?page=${page}`);
 }
 
-// ──────────────────────────────────────────────
-// Gallery
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Gallery
+   ══════════════════════════════════════ */
 export interface GalleryAlbum {
-  _id: string;
-  title_en: string;
-  title_cyr?: string;
-  description_en?: string;
-  description_cyr?: string;
-  date?: string;
+  uuid: string;
+  en?: { title?: string; description?: string };
+  cyr?: { title?: string; description?: string };
   coverImage?: string;
   images?: string[];
-  counters?: { views?: number };
+  date?: string;
 }
 
-interface GalleryListResponse {
-  galleries: GalleryAlbum[];
+export interface GalleryListResponse {
+  results: GalleryAlbum[];
   total: number;
 }
 
-export async function getGalleries(page = 1, limit = 12): Promise<GalleryListResponse> {
-  return apiFetch<GalleryListResponse>("/gallery", { params: { page, limit } });
+export async function getGalleries(page = 1): Promise<GalleryListResponse> {
+  return apiFetch<GalleryListResponse>(`${API_BASE}/gallery/list?page=${page}`);
 }
 
-// ──────────────────────────────────────────────
-// Video
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Video
+   ══════════════════════════════════════ */
 export interface Video {
-  _id: string;
-  title_en: string;
-  title_cyr?: string;
-  date: string;
-  url?: string;
-  thumbnail?: string;
-  length?: string;
-  counters?: { views?: number };
+  uuid?: string;
+  en?: { title?: string };
+  cyr?: { title?: string };
+  publishedAt?: string;
+  thumbnails?: { default?: string; medium?: string; high?: string };
+  videoId?: string;
 }
 
-interface VideoListResponse {
-  videos: Video[];
-  total: number;
-  page: number;
-  pages: number;
-}
-
-export async function getVideos(page = 1, limit = 12): Promise<VideoListResponse> {
-  return apiFetch<VideoListResponse>("/video", { params: { page, limit } });
-}
-
-// ──────────────────────────────────────────────
-// Recent (combined feed)
-// ──────────────────────────────────────────────
-export interface RecentItem {
-  _id: string;
-  type: "lecture" | "blog" | "kirtan" | "video" | "gallery";
-  title_en: string;
-  title_cyr?: string;
-  date: string;
-  [key: string]: unknown;
-}
-
-export async function getRecent(limit = 10): Promise<RecentItem[]> {
-  return apiFetch<RecentItem[]>("/recent", { params: { limit } });
-}
-
-// ──────────────────────────────────────────────
-// Search
-// ──────────────────────────────────────────────
-export interface SearchResult {
-  _id: string;
-  type: string;
-  title_en: string;
-  title_cyr?: string;
-  date?: string;
-  [key: string]: unknown;
-}
-
-interface SearchResponse {
-  results: SearchResult[];
+export interface VideoListResponse {
+  results: Video[];
   total: number;
 }
 
-export async function search(query: string, type?: string): Promise<SearchResponse> {
-  return apiFetch<SearchResponse>("/search", { params: { q: query, type } });
+export async function getVideos(type?: string): Promise<VideoListResponse> {
+  const url = type
+    ? `${API_BASE}/video?type=${type}`
+    : `${API_BASE}/video?missing=type`;
+  return apiFetch<VideoListResponse>(url);
 }
 
-// ──────────────────────────────────────────────
-// Sankirtana
-// ──────────────────────────────────────────────
+/* ══════════════════════════════════════
+   Recently Added
+   ══════════════════════════════════════ */
+export async function getRecent(): Promise<unknown[]> {
+  return apiFetch<unknown[]>(`${API_BASE}/recent`);
+}
+
+/* ══════════════════════════════════════
+   Sankirtana Stories
+   ══════════════════════════════════════ */
 export interface SankirtanaStory {
-  _id: string;
-  text_en?: string;
-  text_cyr?: string;
-  author?: string;
-  date?: string;
-  location?: string;
+  uuid?: string;
+  title?: string;
+  authorName?: string;
+  authorDisplayPictureUrl?: string;
+  media?: { id?: string; key?: string; mediaType?: string }[];
+  dateCreated?: string;
 }
 
-export async function getSankirtana(page = 1, limit = 10) {
-  return apiFetch<{ stories: SankirtanaStory[]; total: number }>("/social", { params: { page, limit } });
+export interface SankirtanaListResponse {
+  results: SankirtanaStory[];
+  total: number;
+}
+
+export async function getSankirtana(page = 1): Promise<SankirtanaListResponse> {
+  return apiFetch<SankirtanaListResponse>(`${API_BASE}/social/list?approved=1&page=${page}`);
+}
+
+/* ══════════════════════════════════════
+   Search
+   ══════════════════════════════════════ */
+export async function search(query: string, index = "lectures_prod"): Promise<{ results: unknown[]; total: number }> {
+  return apiFetch(
+    `${API_BASE}/search?page=1&pageSize=8&q=${encodeURIComponent(query)}&indexes=${index}`
+  );
 }

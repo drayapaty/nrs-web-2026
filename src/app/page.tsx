@@ -15,28 +15,30 @@ import {
   type Lecture,
   type BlogPost,
   type Quote,
+  type LectureListResponse,
+  type BlogListResponse,
 } from "@/lib/api";
 
 /* ── Fallback data ── */
 const fallbackLectures: Partial<Lecture>[] = [
-  { title_en: "Sunday Program Lecture - BG 10.11", date: "2026-03-08", place_en: "Kyiv", length: "49:44" },
-  { title_en: "Vyasa Puja Lecture", date: "2026-03-07", place_en: "Kyiv", length: "1:11:25" },
-  { title_en: "Initiation Lecture", date: "2026-03-06", place_en: "Kyiv", length: "57:36" },
-  { title_en: "Gaura Purnima Lecture - CC Madhya 6.255", date: "2026-03-03", place_en: "Kyiv", length: "47:31" },
-  { title_en: "SB 6.2.13 - The Ultimate Shelter", date: "2026-02-28", place_en: "Budapest", length: "1:02:15" },
+  { en: { title: "Sunday Program Lecture - BG 10.11" }, publishedDate: "2026-03-08", place: { en: "Kyiv" }, duration: "49:44" },
+  { en: { title: "Vyasa Puja Lecture" }, publishedDate: "2026-03-07", place: { en: "Kyiv" }, duration: "1:11:25" },
+  { en: { title: "Initiation Lecture" }, publishedDate: "2026-03-06", place: { en: "Kyiv" }, duration: "57:36" },
+  { en: { title: "Gaura Purnima Lecture - CC Madhya 6.255" }, publishedDate: "2026-03-03", place: { en: "Kyiv" }, duration: "47:31" },
+  { en: { title: "SB 6.2.13 - The Ultimate Shelter" }, publishedDate: "2026-02-28", place: { en: "Budapest" }, duration: "1:02:15" },
 ];
 
 const fallbackBlogs: Partial<BlogPost>[] = [
-  { title_en: "Gaura Purnima Lectures", excerpt_en: "Below is a playlist of Gaura Purnima Lectures.", date: "2026-03-02", tags: ["Gaura Purnima"] },
-  { title_en: "The Departure of His Holiness Badrinarayan Maharaja", excerpt_en: "Last night, I received the devastating news that my dear godbrother...", date: "2026-02-27", tags: ["In Memoriam"] },
-  { title_en: "Online Vyasa Puja Lecture", excerpt_en: "Vyasa Puja celebration from Hungary, broadcast online...", date: "2026-02-22", tags: ["Vyasa Puja"] },
+  { en: { title: "Gaura Purnima Lectures", body: "Below is a playlist of Gaura Purnima Lectures." }, publishDate: "2026-03-02", tags: { en: ["Gaura Purnima"] } },
+  { en: { title: "The Departure of His Holiness Badrinarayan Maharaja", body: "Last night, I received the devastating news that my dear godbrother..." }, publishDate: "2026-02-27", tags: { en: ["In Memoriam"] } },
+  { en: { title: "Online Vyasa Puja Lecture", body: "Vyasa Puja celebration from Hungary, broadcast online..." }, publishDate: "2026-02-22", tags: { en: ["Vyasa Puja"] } },
 ];
 
 const fallbackQuote: Quote = {
   _id: "fallback",
-  text_en: "There is no guarantee that after initiation, advancement will be quicker. But at initiation, the disciple makes a commitment and should then draw strength from that commitment.",
-  source_en: "Lectures from a Disciple, Vol. 2",
-  date: "March 16",
+  en: { text: "There is no guarantee that after initiation, advancement will be quicker. But at initiation, the disciple makes a commitment and should then draw strength from that commitment.", source: "Lectures from a Disciple, Vol. 2" },
+  cyr: { text: "Нет гарантии, что после инициации продвижение будет быстрее. Но при инициации ученик берёт на себя обязательство и должен черпать силу из этого обязательства.", source: "Лекции ученика, том 2" },
+  quoteDate: "March 16",
 };
 
 function fmtDate(d: string) {
@@ -44,30 +46,25 @@ function fmtDate(d: string) {
   catch { return d; }
 }
 
-function fmtDateLong(d: string) {
-  try { return new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }); }
-  catch { return d; }
-}
-
 export default function Home() {
   const { lang, t } = useLanguage();
 
-  const { data: lectureData } = useApi(
-    () => getLectures(1, 5),
-    { lectures: [], total: 0, page: 1, pages: 1 }
+  const { data: lectureData } = useApi<LectureListResponse>(
+    () => getLectures(1),
+    { results: [], total: 0, page: 1, pages: 1 }
   );
-  const { data: blogData } = useApi(
-    () => getBlogs(1, 3),
-    { blogs: [], total: 0, page: 1, pages: 1 }
+  const { data: blogData } = useApi<BlogListResponse>(
+    () => getBlogs(1),
+    { results: [], total: 0, page: 1, pages: 1 }
   );
-  const { data: quoteData } = useApi(
+  const { data: quoteData } = useApi<Quote>(
     () => getQuoteOfTheDay(),
     fallbackQuote
   );
 
-  const lectures: Partial<Lecture>[] = lectureData.lectures.length > 0 ? lectureData.lectures : fallbackLectures;
-  const blogs: Partial<BlogPost>[] = blogData.blogs.length > 0 ? blogData.blogs : fallbackBlogs;
-  const quote = quoteData._id !== "fallback" ? quoteData : fallbackQuote;
+  const lectures: Partial<Lecture>[] = lectureData.results?.length > 0 ? lectureData.results.slice(0, 5) : fallbackLectures;
+  const blogs: Partial<BlogPost>[] = blogData.results?.length > 0 ? blogData.results.slice(0, 3) : fallbackBlogs;
+  const quote = quoteData._id !== "fallback" && (quoteData.en?.text || quoteData.cyr?.text) ? quoteData : fallbackQuote;
 
   return (
     <main className="overflow-x-hidden bg-cream-50">
@@ -165,7 +162,7 @@ export default function Home() {
 
           <blockquote>
             <p className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] text-ink-900 leading-[1.3] font-medium italic">
-              &ldquo;{t(quote.text_en, quote.text_cyr)}&rdquo;
+              &ldquo;{t(quote.en?.text, quote.cyr?.text)}&rdquo;
             </p>
           </blockquote>
 
@@ -175,7 +172,7 @@ export default function Home() {
               {lang === "en" ? "Niranjana Swami" : "Ниранджана Свами"}
             </p>
             <p className="text-ink-400 text-xs mt-1">
-              {t(quote.source_en, quote.source_cyr)}
+              {t(quote.en?.source, quote.cyr?.source)}
             </p>
           </div>
         </ScrollReveal>
@@ -211,9 +208,9 @@ export default function Home() {
 
             <div className="space-y-0 divide-y divide-white/[0.06]">
               {lectures.map((lecture, i) => (
-                <ScrollReveal key={i} delay={i * 80}>
+                <ScrollReveal key={lecture.uuid || i} delay={i * 80}>
                   <Link
-                    href="/media/lectures"
+                    href={lecture.uuid ? `/media/lectures/${lecture.uuid}` : "/media/lectures"}
                     className="group flex items-center gap-4 py-5 transition-colors"
                   >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-gold-400/50 group-hover:bg-gold-400/10 transition-all duration-300">
@@ -224,12 +221,12 @@ export default function Home() {
 
                     <div className="flex-1 min-w-0">
                       <p className="text-white/80 text-sm font-medium truncate group-hover:text-white transition-colors">
-                        {t(lecture.title_en, (lecture as Lecture).title_cyr)}
+                        {t(lecture.en?.title, lecture.cyr?.title)}
                       </p>
                       <p className="text-white/25 text-xs mt-1">
-                        {lecture.date ? fmtDate(lecture.date) : ""}
-                        {lecture.place_en ? ` · ${t(lecture.place_en, (lecture as Lecture).place_cyr)}` : ""}
-                        {lecture.length ? ` · ${lecture.length}` : ""}
+                        {(lecture.publishedDate || lecture.lectureDate) ? fmtDate(lecture.publishedDate || lecture.lectureDate || "") : ""}
+                        {lecture.place ? ` · ${t(lecture.place.en, lecture.place.cyr)}` : ""}
+                        {lecture.duration ? ` · ${lecture.duration}` : ""}
                       </p>
                     </div>
 
@@ -285,21 +282,21 @@ export default function Home() {
 
           <div className="divide-y divide-ink-200/60">
             {blogs.map((post, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
+              <ScrollReveal key={post.uuid || i} delay={i * 100}>
                 <Link
-                  href="/blog"
+                  href={post.uuid ? `/blog/${post.uuid}` : "/blog"}
                   className="group flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-10 py-8 transition-colors"
                 >
                   <time className="text-ink-400 text-xs font-mono shrink-0 sm:w-24 counter-label">
-                    {post.date ? fmtDate(post.date) : ""}
+                    {(post.publishDate || post.blogDate) ? fmtDate(post.publishDate || post.blogDate || "") : ""}
                   </time>
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-display text-xl sm:text-2xl font-semibold text-ink-900 group-hover:text-gold-600 transition-colors leading-snug">
-                      {t(post.title_en, (post as BlogPost).title_cyr)}
+                      {t(post.en?.title, post.cyr?.title)}
                     </h3>
                     <p className="mt-2 text-ink-400 text-sm leading-relaxed line-clamp-1">
-                      {t(post.excerpt_en, (post as BlogPost).excerpt_cyr) || ""}
+                      {t(post.en?.body, post.cyr?.body) || ""}
                     </p>
                   </div>
 
