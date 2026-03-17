@@ -6,47 +6,41 @@ import { useLanguage } from "@/lib/language";
 export default function Footer() {
   const { lang } = useLanguage();
 
-  const mediaLinks = lang === "en"
-    ? [["Lectures", "/media/lectures"], ["Kirtans", "/media/kirtans"], ["Video", "/media/video"], ["Gallery", "/media/gallery"], ["Transcriptions", "/media/transcriptions"]]
-    : [["Лекции", "/media/lectures"], ["Киртаны", "/media/kirtans"], ["Видео", "/media/video"], ["Галерея", "/media/gallery"], ["Транскрипции", "/media/transcriptions"]];
-
-  const exploreLinks = lang === "en"
-    ? [["Biography", "/biography"], ["Blog", "/blog"], ["Quotes", "/quotes"], ["Sankirtana Stories", "/sankirtana"], ["Calendar", "/calendar"]]
-    : [["Биография", "/biography"], ["Блог", "/blog"], ["Цитаты", "/quotes"], ["Истории санкиртаны", "/sankirtana"], ["Календарь", "/calendar"]];
-
   return (
-    <footer className="bg-temple-900 text-temple-300">
-      {/* Maha Mantra Banner */}
-      <div className="bg-saffron-600 py-6 text-center">
-        <p className="font-display text-xl sm:text-2xl text-white/95 italic tracking-wide">
-          Hare Krishna Hare Krishna &middot; Krishna Krishna Hare Hare
-        </p>
-        <p className="font-display text-xl sm:text-2xl text-white/95 italic tracking-wide mt-1">
-          Hare Rama Hare Rama &middot; Rama Rama Hare Hare
+    <footer className="bg-ink-950 text-ink-400">
+      {/* Mantra strip */}
+      <div className="py-8 text-center border-b border-white/[0.06]">
+        <p className="font-display text-lg sm:text-xl text-white/20 italic tracking-widest">
+          Hare Krishna Hare Krishna · Krishna Krishna Hare Hare · Hare Rama Hare Rama · Rama Rama Hare Hare
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-4">
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+          {/* About */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <p className="font-display text-2xl text-white font-semibold tracking-tight">
               {lang === "en" ? "Niranjana Swami" : "Ниранджана Свами"}
-            </h3>
-            <p className="text-sm leading-relaxed text-temple-400">
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-ink-500 max-w-xs">
               {lang === "en"
-                ? "Official website of His Holiness Niranjana Swami, a senior disciple of His Divine Grace A.C. Bhaktivedanta Swami Prabhupada."
-                : "Официальный сайт Его Святейшества Ниранджаны Свами, старшего ученика Его Божественной Милости А.Ч. Бхактиведанты Свами Прабхупады."}
+                ? "Official website. A senior disciple of His Divine Grace A.C. Bhaktivedanta Swami Prabhupada."
+                : "Официальный сайт. Старший ученик Его Божественной Милости А.Ч. Бхактиведанты Свами Прабхупады."}
             </p>
           </div>
 
+          {/* Media */}
           <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-4">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-ink-500 mb-5">
               {lang === "en" ? "Media" : "Медиа"}
-            </h3>
-            <ul className="space-y-2.5">
-              {mediaLinks.map(([label, href]) => (
+            </p>
+            <ul className="space-y-3">
+              {(lang === "en"
+                ? [["Lectures", "/media/lectures"], ["Kirtans", "/media/kirtans"], ["Video", "/media/video"], ["Gallery", "/media/gallery"]]
+                : [["Лекции", "/media/lectures"], ["Киртаны", "/media/kirtans"], ["Видео", "/media/video"], ["Галерея", "/media/gallery"]]
+              ).map(([label, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-temple-400 hover:text-saffron-400 transition-colors">
+                  <Link href={href} className="text-sm text-ink-400 hover:text-white transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -54,14 +48,18 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Explore */}
           <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-4">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-ink-500 mb-5">
               {lang === "en" ? "Explore" : "Изучить"}
-            </h3>
-            <ul className="space-y-2.5">
-              {exploreLinks.map(([label, href]) => (
+            </p>
+            <ul className="space-y-3">
+              {(lang === "en"
+                ? [["Biography", "/biography"], ["Blog", "/blog"], ["Quotes", "/quotes"], ["Sankirtana", "/sankirtana"]]
+                : [["Биография", "/biography"], ["Блог", "/blog"], ["Цитаты", "/quotes"], ["Санкиртана", "/sankirtana"]]
+              ).map(([label, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-temple-400 hover:text-saffron-400 transition-colors">
+                  <Link href={href} className="text-sm text-ink-400 hover:text-white transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -69,32 +67,27 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Connect */}
           <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-4">
-              {lang === "en" ? "Contact" : "Контакты"}
-            </h3>
-            <p className="text-sm text-temple-400 leading-relaxed">
-              1683 Main Street<br />
-              East Hartford, CT 06108
+            <p className="text-[11px] uppercase tracking-[0.2em] text-ink-500 mb-5">
+              {lang === "en" ? "Connect" : "Контакты"}
             </p>
             <Link
               href="/contacts"
-              className="inline-flex mt-4 text-sm text-saffron-400 hover:text-saffron-300 transition-colors font-medium"
+              className="text-sm text-ink-400 hover:text-white transition-colors"
             >
-              {lang === "en" ? "Contact Us" : "Связаться с нами"} &rarr;
+              {lang === "en" ? "Contact Us" : "Связаться с нами"}
             </Link>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-temple-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-temple-500">
-            &copy; {new Date().getFullYear()} {lang === "en" ? "All Rights Reserved" : "Все права защищены"}
+        <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-ink-600">
+            &copy; {new Date().getFullYear()} {lang === "en" ? "Niranjana Swami. All rights reserved." : "Ниранджана Свами. Все права защищены."}
           </p>
-          <div className="flex gap-6">
-            <Link href="/privacy-policy" className="text-xs text-temple-500 hover:text-temple-300 transition-colors">
-              {lang === "en" ? "Privacy Policy" : "Политика конфиденциальности"}
-            </Link>
-          </div>
+          <p className="text-[10px] text-ink-700 uppercase tracking-widest">
+            ISKCON Founder–Acharya His Divine Grace A.C. Bhaktivedanta Swami Prabhupada
+          </p>
         </div>
       </div>
     </footer>
