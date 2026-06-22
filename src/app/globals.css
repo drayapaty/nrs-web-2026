@@ -202,3 +202,75 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
+
+/* ── Overlay fade in ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Overlay scale in ── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97) translateY(-8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Menu stagger animation ── */
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Loading bar ── */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold-600), var(--color-gold-400), var(--color-gold-300), var(--color-gold-400));
+  background-size: 200% 100%;
+  animation: loadingBarShimmer 800ms ease-in-out infinite;
+  z-index: 200;
+  transition: width 300ms ease;
+}
+
+@keyframes loadingBarShimmer {
+  0% { background-position: -200% 0; opacity: 1; }
+  100% { background-position: 200% 0; opacity: 1; }
+}
+
+/* ── Overlay fade in ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Overlay scale in ── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97) translateY(-8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Menu stagger animation ── */
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Loading bar ── */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold-600), var(--color-gold-400), var(--color-gold-300), var(--color-gold-400));
+  background-size: 200% 100%;
+  animation: loadingBarShimmer 800ms ease-in-out infinite;
+  z-index: 200;
+  transition: width 300ms ease;
+}
+
+@keyframes loadingBarShimmer {
+  0% { background-position: -200% 0; opacity: 1; }
+  100% { background-position: 200% 0; opacity: 1; }
+}
