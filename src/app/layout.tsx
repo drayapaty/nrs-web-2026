@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import BackToTop from "@/components/BackToTop";
+import LoadingBar from "@/components/LoadingBar";
 
 export const metadata: Metadata = {
   title: "H.H. Niranjana Swami — Official Website",
@@ -24,7 +27,19 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-cream-50">
-        <Providers>{children}</Providers>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-ink-950 focus:text-cream-50 focus:text-sm focus:rounded"
+        >
+          Skip to content
+        </a>
+        <Providers>
+          <Suspense>
+            <LoadingBar />
+          </Suspense>
+          <div id="main-content">{children}</div>
+          <BackToTop />
+        </Providers>
       </body>
     </html>
   );

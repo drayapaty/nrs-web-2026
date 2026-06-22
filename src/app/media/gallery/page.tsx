@@ -3,6 +3,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
+import LightboxModal from "@/components/LightboxModal";
 import Link from "next/link";
 import { useState } from "react";
 import { useLanguage } from "@/lib/language";
@@ -12,6 +13,10 @@ import { getGalleries, type GalleryAlbum, type GalleryListResponse } from "@/lib
 export default function GalleryPage() {
   const { lang, t } = useLanguage();
   const [page, setPage] = useState(1);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxCaption, setLightboxCaption] = useState("");
 
   const { data, loading } = useApi<GalleryListResponse>(
     () => getGalleries(page),
@@ -20,6 +25,19 @@ export default function GalleryPage() {
   );
 
   const galleries = data.results || [];
+
+  const openLightbox = (album: GalleryAlbum, imageIndex: number) => {
+    const images = album.images && album.images.length > 0
+      ? album.images
+      : album.coverImage
+      ? [album.coverImage]
+      : [];
+    if (images.length === 0) return;
+    setLightboxImages(images);
+    setLightboxIndex(imageIndex);
+    setLightboxCaption(t(album.en?.title, album.cyr?.title) || "Gallery");
+    setLightboxOpen(true);
+  };
 
   return (
     <main className="bg-cream-50 min-h-screen">
@@ -66,8 +84,11 @@ export default function GalleryPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {galleries.map((album: GalleryAlbum, i: number) => (
                 <ScrollReveal key={album.uuid || i} delay={i * 60}>
-                  <div className="group cursor-pointer">
-                    <div className="relative aspect-[4/3] bg-ink-100 overflow-hidden">
+                  <div
+                    className="group cursor-pointer"
+                    onClick={() => openLightbox(album, 0)}
+                  >
+                    <div className="relative aspect-[4/3] bg-ink-100 overflow-hidden rounded-sm ring-1 ring-transparent group-hover:ring-gold-400/30 transition-all duration-300">
                       {album.coverImage ? (
                         <img
                           src={album.coverImage}
@@ -81,6 +102,17 @@ export default function GalleryPage() {
                           </svg>
                         </div>
                       )}
+                      <div className="absolute inset-0 bg-ink-950/0 group-hover:bg-ink-950/20 transition-colors duration-300 flex items-center justify-center">
+                        <svg
+                          className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                        </svg>
+                      </div>
                     </div>
                     <div className="mt-3">
                       <h3 className="font-display text-base font-semibold text-ink-900 group-hover:text-gold-600 transition-colors leading-snug">
@@ -104,6 +136,15 @@ export default function GalleryPage() {
           )}
         </div>
       </section>
+
+      <LightboxModal
+        images={lightboxImages}
+        currentIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        onIndexChange={setLightboxIndex}
+        caption={lightboxCaption}
+      />
 
       <Footer />
     </main>
