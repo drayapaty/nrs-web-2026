@@ -85,14 +85,12 @@ export default function Navigation() {
             ))}
 
             {/* Language toggle */}
-          <button
-            onClick={() => setOpen(!open)}
-            aria-expanded={open}
-            aria-label={open ? (lang === "en" ? "Close menu" : "Закрыть меню") : (lang === "en" ? "Open menu" : "Открыть меню")}
-            className={`lg:hidden p-2 transition-colors duration-500 ${
-              scrolled ? "text-ink-700" : "text-white"
-            }`}
-          >
+            <button
+              onClick={toggleLang}
+              className={`text-[13px] font-medium tracking-wide uppercase transition-colors duration-500 ${
+                scrolled ? "text-ink-600 hover:text-ink-900" : "text-white/70 hover:text-white"
+              }`}
+            >
               {lang === "en" ? "РУС" : "ENG"}
             </button>
           </div>
