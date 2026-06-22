@@ -51,7 +51,7 @@ export default function Navigation() {
             : "top-10 bg-ink-950/50 backdrop-blur-md border-b border-white/10"
         }`}
       >
-        <nav className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-16 sm:h-20">
+        <nav aria-label="Main navigation" className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-16 sm:h-20">
           {/* Logo + Name */}
           <Link href="/" className="group flex items-center gap-3">
             <Image
@@ -87,8 +87,8 @@ export default function Navigation() {
             {/* Language toggle */}
             <button
               onClick={toggleLang}
-              className={`text-[13px] font-medium tracking-wide transition-colors duration-500 ${
-                scrolled ? "text-ink-400 hover:text-ink-700" : "text-white/50 hover:text-white"
+              className={`text-[13px] font-medium tracking-wide uppercase transition-colors duration-500 ${
+                scrolled ? "text-ink-600 hover:text-ink-900" : "text-white/70 hover:text-white"
               }`}
             >
               {lang === "en" ? "РУС" : "ENG"}
@@ -98,6 +98,8 @@ export default function Navigation() {
           {/* Mobile menu button */}
           <button
             onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-label={open ? (lang === "en" ? "Close menu" : "Закрыть меню") : (lang === "en" ? "Open menu" : "Открыть меню")}
             className={`lg:hidden p-2 transition-colors duration-500 ${
               scrolled ? "text-ink-700" : "text-white"
             }`}
@@ -115,7 +117,7 @@ export default function Navigation() {
 
       {/* ── Mobile overlay ── */}
       {open && (
-        <div className="fixed inset-0 z-[60] bg-ink-950/95 backdrop-blur-xl flex flex-col justify-center items-center">
+        <div role="dialog" aria-modal="true" aria-label={lang === "en" ? "Navigation menu" : "Меню навигации"} className="fixed inset-0 z-[60] bg-ink-950/95 backdrop-blur-xl flex flex-col justify-center items-center">
           <button
             onClick={() => setOpen(false)}
             className="absolute top-6 right-6 text-white/60 hover:text-white p-2"
