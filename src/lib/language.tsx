@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 
 export type Lang = "en" | "cyr";
 
@@ -19,11 +19,36 @@ const LanguageContext = createContext<LanguageContextType>({
   t: (en) => en ?? "",
 });
 
+function getInitialLang(): Lang {
+  try {
+    const stored = localStorage.getItem("lang");
+    if (stored === "en" || stored === "cyr") return stored;
+  } catch {}
+  return "en";
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("en");
+  const [lang, setLangState] = useState<Lang>("en");
+
+  useEffect(() => {
+    setLangState(getInitialLang());
+  }, []);
+
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    try {
+      localStorage.setItem("lang", l);
+    } catch {}
+  }, []);
 
   const toggleLang = useCallback(() => {
-    setLang((prev) => (prev === "en" ? "cyr" : "en"));
+    setLangState((prev) => {
+      const next = prev === "en" ? "cyr" : "en";
+      try {
+        localStorage.setItem("lang", next);
+      } catch {}
+      return next;
+    });
   }, []);
 
   const t = useCallback(
